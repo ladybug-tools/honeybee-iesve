@@ -8,7 +8,6 @@ from ladybug_geometry.geometry3d import Vector3D, Plane, Face3D, Polyface3D, Mes
 from ladybug.location import Location
 from honeybee.facetype import AirBoundary
 from honeybee.door import Door
-from honeybee.room import Room
 
 from .config import IESVE_TOLERANCE, IMPORT_IGNORE
 from .types import GEM_TYPES
@@ -32,9 +31,9 @@ def _gen_ve_id(display_name):
     identifier = re.sub(pattern, '', display_name).upper()
     if len(identifier) < 2:
         print(
-            f'Unable to generate a valid GEM identifier from this name "{display_name}". '
+            'Unable to generate a valid GEM identifier from this name "{}". '
             'Room display names must retain at least two characters after removing '
-            'vowels.'
+            'vowels.'.format(display_name)
         )
         return 'ZZ'
     return identifier[:2]
@@ -50,14 +49,13 @@ def _convert_room_ids(model):
     id_mapper = {}
     id_counter = {}
     for room in model.rooms:
-        room: Room
         identifier = room.identifier
         ve_identifier = _gen_ve_id(room.display_name)
         if ve_identifier not in id_counter:
             id_counter[ve_identifier] = -1
         id_counter[ve_identifier] += 1
-        full_ve_id = f'{ve_identifier}{id_counter[ve_identifier]:06d}'
-        full_ve_fallback_id = f'RM{id_counter[ve_identifier]:06d}'
+        full_ve_id = '{}{:06d}'.format(ve_identifier, id_counter[ve_identifier])
+        full_ve_fallback_id = 'RM{:06d}'.format(id_counter[ve_identifier])
         try:
             room.identifier = full_ve_id
             id_mapper[identifier] = full_ve_id
@@ -148,12 +146,12 @@ def _shade_geometry_to_ies(
         base = geometry.lower_right_corner
         yz_rotation = abs(90 - round(math.degrees(geometry.plane.altitude), 6))
         xy_rotation = abs(360 - round(math.degrees(geometry.plane.azimuth), 6))
-        pv_info = f'{round(base.x, 4)} {round(base.y, 4)} {round(base.z, 4)} ' \
-            f'{round(w, 4)} {round(h, 4)} ' \
-            f'{round(xy_rotation, 4)} {round(yz_rotation, 4)}'
-        return gem_type.to_gem(
-                name=name, identifier=identifier, vertices=pv_info
+        pv_info = '{x} {y} {z} {w} {h} {alt} {azimuth}'.format(
+                x=round(base.x, 4), y=round(base.y, 4), z=round(base.z, 4),
+                w=round(w, 4), h=round(h, 4),
+                alt=round(xy_rotation, 4), azimuth=round(yz_rotation, 4)
             )
+        return gem_type.to_gem(name=name, identifier=identifier, vertices=pv_info)
     elif gem_type == GEM_TYPES.Tree:
         # TODO: create objects for every IES object to remove duplicate values
         # like the scales here
@@ -164,13 +162,15 @@ def _shade_geometry_to_ies(
         # this logic won't work for values larger than 180 but that's for later
         xy_rotation = abs(90 - round(math.degrees(geometry.plane.azimuth), 6))
         yz_rotation = round(math.degrees(geometry.plane.altitude), 6)
-        tree_info = f'2D Tree {tree_type}\n' \
-            f'{round(base.x, 4)} {round(base.y, 4)} {round(base.z, 4)} ' \
-            f'{round(w / x_scale, 4)} {round(w / y_scale, 4)} {round(h / z_scale, 4)} ' \
-            f'{round(xy_rotation, 4)} {round(yz_rotation, 4)}'
-        return gem_type.to_gem(
-                name=name, identifier=identifier, vertices=tree_info
+        tree_info = \
+            '2D Tree {tree_type}\n' \
+            '{x} {y} {z} {wx} {wy} {h} {alt} {azimuth}'.format(
+                tree_type=tree_type,
+                x=round(base.x, 4), y=round(base.y, 4), z=round(base.z, 4),
+                wx=round(w / x_scale, 4), wy=round(w / y_scale, 4), h=round(h / z_scale, 4),
+                alt=round(xy_rotation, 4), azimuth=round(yz_rotation, 4)
             )
+        return gem_type.to_gem(name=name, identifier=identifier, vertices=tree_info)
 
     # process the geometry as a ContextBuilding or Shade
     if isinstance(geometry, Polyface3D):
