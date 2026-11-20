@@ -116,6 +116,7 @@ class GEM_TYPES(object):
 
     @classmethod
     def from_info(cls, category, type_, subtype, keyword):
+        """Initialize type from GEM info."""
         if category == 1 and subtype == 2001 and type_ == 1 and keyword == 'IES':
             return cls.Space
         if category == 1 and subtype == 2002 and type_ == 1 and keyword == 'IES':

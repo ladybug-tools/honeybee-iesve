@@ -8,6 +8,8 @@ from ladybug_geometry.geometry3d import Vector3D, Plane, Face3D, Polyface3D, Mes
 from ladybug.location import Location
 from honeybee.facetype import AirBoundary
 from honeybee.door import Door
+from honeybee.shade import Shade
+from honeybee.shademesh import ShadeMesh
 
 from .config import IESVE_TOLERANCE, IMPORT_IGNORE
 from .types import GEM_TYPES
@@ -66,14 +68,15 @@ def _convert_room_ids(model):
     return id_mapper
 
 
-def _opening_to_ies(parent_geo, opening_geos, opening_type=0):
-    """Translate an opening to gem format.
+def _opening_to_gem(parent_geo, opening_geos, opening_type=0):
+    """Translate an opening to GEM format.
 
     Args:
-        parent_geo: Geometry of the parent object as a Face3D.
-        opening_geos: A list of Face3D geometries for the openings in the Face3D.
-        opening_type: An integer between 0-2. 0 for apertures, 1 for doors and 2 for
-            holes.
+        parent_geo: Geometry of the parent Face as a Face3D.
+        opening_geos: A list of Face3D geometries for the openings (corresponding
+            to Apertures and Doors).
+        opening_type: An integer between 0-2. 0 is for Apertures, 1 is for Doors
+            and 2 is for AirBoundary holes.
 
     Returns:
         A formatted string for the opening.
@@ -95,7 +98,7 @@ def _opening_to_ies(parent_geo, opening_geos, opening_type=0):
     return '\n'.join(openings)
 
 
-def _vertices_to_ies(vertices):
+def _vertices_to_gem(vertices):
     """Get a GEM string for a list of Point3D vertices.
 
     Vertices are rounded to 6 decimal places for consistency with how GEM files
@@ -110,25 +113,30 @@ def _vertices_to_ies(vertices):
     return vertices
 
 
-def _shade_geometry_to_ies(
-    geometry, name, is_detached=True, identifier=None, user_data=None
-):
-    """Translate an shade geometry to GEM format.
+def shade_to_gem(shade):
+    """Translate a Honeybee Shade or ShadeMesh to GEM format.
 
     Args:
-        geometry: Geometry of the parent object as a Face3D, Polyface3D or Mesh3D.
-        name: The name of the shade as a text string.
-        is_detached: A boolean for whether the shade is detached or not. (Default: True).
-        identifier: The identifier of the object. If None, the name will be
-            used as the identifier.
-        user_data: The user_data attached to the shade object if it exists. This
-            can be used to change the GEM TYPE of the shade object.
+        shade: A Honeybee Shade or ShadeMesh object to be converted into a
+            GEM string. This can also be a list of Shade objects in which case
+            the geometries of the Shade will be joined together into a single
+            shade group in the output GEM string.
 
     Returns:
-        A formatted string for the shade geometry.
+        A formatted string for the input shade.
     """
-    # establish variables to hold the faces and track the number of openings
-    faces = []
+    # process the inputs
+    if isinstance(shade, (Shade, ShadeMesh)):
+        geometry = shade.geometry
+        name, identifier = shade.display_name, shade.identifier
+        is_detached, user_data = shade.is_detached, shade.user_data
+    else:  # assume that it is a list of Shade objects
+        geometry = Polyface3D.from_faces(
+            [s.geometry for s in shade], tolerance=IESVE_TOLERANCE
+        )
+        name, identifier = shade[0].display_name, shade[0].identifier
+        is_detached, user_data = shade[0].is_detached, shade[0].user_data
+    name = ' '.join(name.split())
 
     # process the user data into a GEM TYPE
     gem_type = GEM_TYPES.from_user_data(user_data)
@@ -173,10 +181,11 @@ def _shade_geometry_to_ies(
         return gem_type.to_gem(name=name, identifier=identifier, vertices=tree_info)
 
     # process the geometry as a ContextBuilding or Shade
+    faces = []
     if isinstance(geometry, Polyface3D):
         # Polyface3D
         unique_vertices = geometry.vertices
-        vertices = _vertices_to_ies(unique_vertices)
+        vertices = _vertices_to_gem(unique_vertices)
         for face_i, face in zip(geometry.face_indices, geometry.faces):
             index = [str(v + 1) for v in face_i[0]]
             face_str = '%d %s\n' % (len(index), ' '.join(index))
@@ -185,7 +194,7 @@ def _shade_geometry_to_ies(
     elif isinstance(geometry, Mesh3D):
         # Mesh3D
         unique_vertices = geometry.vertices
-        vertices = _vertices_to_ies(unique_vertices)
+        vertices = _vertices_to_gem(unique_vertices)
         for face in geometry.faces:
             index = [str(v + 1) for v in face]
             face_str = '%d %s\n' % (len(index), ' '.join(index))
@@ -194,7 +203,7 @@ def _shade_geometry_to_ies(
     else:
         # Face3D
         unique_vertices = geometry.lower_left_counter_clockwise_vertices
-        vertices = _vertices_to_ies(unique_vertices)
+        vertices = _vertices_to_gem(unique_vertices)
         index = [str(v + 1) for v in range(len(unique_vertices))]
         face_str = '%d %s\n' % (len(index), ' '.join(index))
         faces.append('%s%d' % (face_str, 0))
@@ -214,57 +223,17 @@ def _shade_geometry_to_ies(
     )
 
 
-def _shade_group_to_ies(shades):
-    """Convert a list of Honeybee Shade objects into a GEM string of a shade group.
+def shades_to_gem(shades):
+    """Convert a list of Honeybee Shades and/or ShadeMesh to a GEM string.
 
     Args:
-        shades: A list of Honeybee Shade objects. The individual Face3D geometries
-            of the Shade objects should create a closed volume. The the first
-            shade is used to name the whole group.
+        shades: A list of Honeybee Shade or ShadeMesh objects. If input shades
+            have a user_data key named __group_id__, they will be written into
+            the GEM string as a single shade group rather than an individual
+            shade face.
 
     Returns:
-        A formatted string that represents this shade group in GEM format.
-    """
-    group_geometry = Polyface3D.from_faces(
-        [shade.geometry for shade in shades], tolerance=IESVE_TOLERANCE
-    )
-    first_shade = shades[0]
-    # remove new lines from the name
-    shade_name = ' '.join(first_shade.display_name.split())
-    return _shade_geometry_to_ies(
-        group_geometry, shade_name, is_detached=first_shade.is_detached,
-        identifier=first_shade.identifier, user_data=first_shade.user_data
-    )
-
-
-def _shade_to_ies(shade):
-    """Convert a single Honeybee Shade to a GEM string.
-
-    Args:
-        shade: A Honeybee Shade object.
-
-    Returns:
-        A formatted string that represents this shade in GEM format.
-    """
-    shade_geo = shade.geometry
-    # remove new lines from the name
-    shade_name = ' '.join(shade.display_name.split())
-    return _shade_geometry_to_ies(
-        shade_geo, shade_name, is_detached=shade.is_detached,
-        identifier=shade.identifier, user_data=shade.user_data
-    )
-
-
-def shades_to_ies(shades):
-    """Convert a list of Honeybee Shades to a GEM string.
-
-    Args:
-        shades: A list of Shade faces. If the shades have a user_data key
-            named __group_id__, they will be written into the GEM as a single
-            shade group.
-
-    Returns:
-        A formatted string that represents this shade in GEM format.
+        A formatted string that represents the inputs shades in GEM format.
     """
     # organize the shades into groups
     shade_groups = {}
@@ -273,50 +242,29 @@ def shades_to_ies(shades):
         user_data = shade.user_data
         if user_data and IMPORT_IGNORE in user_data \
                 and user_data[IMPORT_IGNORE]:
-            continue  # ignore the shade face with __ies_import__ key
+            continue  # ignore the shade with __ies_import__ key
+        if isinstance(shade, ShadeMesh):
+            no_groups.append(shade)
+            continue  # always treat ShadeMesh as its own shade group
         try:
             group_id = shade.user_data['__group_id__']
         except (TypeError, KeyError):
             no_groups.append(shade)
             continue
         else:
-            if group_id not in shade_groups:
-                shade_groups[group_id] = [shade]
-            else:
+            try:
                 shade_groups[group_id].append(shade)
+            except KeyError:  # first shade in the group
+                shade_groups[group_id] = [shade]
 
     # create the GEM strings of the shades
     single_keys = [key for key, value in shade_groups.items() if len(value) == 1]
     for key in single_keys:
         v = shade_groups.pop(key)
         no_groups.append(v[0])
-
-    single_shades = '\n'.join([_shade_to_ies(shade) for shade in no_groups])
-    group_shades = '\n'.join(
-        [_shade_group_to_ies(shades) for shades in shade_groups.values()]
-    )
-
+    single_shades = '\n'.join([shade_to_gem(shade) for shade in no_groups])
+    group_shades = '\n'.join([shade_to_gem(shades) for shades in shade_groups.values()])
     return '\n'.join((single_shades, group_shades))
-
-
-def shade_meshes_to_ies(shade_meshes):
-    """Convert a list of ShadeMeshes to a GEM string.
-
-    Args:
-        shade_meshes: A list of Honeybee ShadeMesh objects.
-
-    Returns:
-        A formatted string that represents this shade in GEM format.
-
-    """
-    return '' if not shade_meshes else \
-        '\n'.join(
-            _shade_geometry_to_ies(
-                geometry=shade.geometry,
-                name=shade.display_name, is_detached=shade.is_detached,
-                identifier=shade.identifier, user_data=shade.user_data
-            ) for shade in shade_meshes
-        )
 
 
 def room_to_ies(room):
@@ -332,7 +280,7 @@ def room_to_ies(room):
     room.display_name = ' '.join(room.display_name.split())
 
     unique_vertices = room.geometry.vertices
-    vertices = _vertices_to_ies(unique_vertices)
+    vertices = _vertices_to_gem(unique_vertices)
     face_count = len(room.faces)
     faces = []
     air_boundary_count = 0
@@ -355,7 +303,7 @@ def room_to_ies(room):
         if isinstance(face.type, AirBoundary):
             # add the face itself as the hole
             sub_faces = [Face3D(fg.boundary, fg.plane)]
-            openings.append(_opening_to_ies(fg, sub_faces, 2))
+            openings.append(_opening_to_gem(fg, sub_faces, 2))
             open_count += 1
 
         # write the apertures and doors as openings
@@ -367,14 +315,15 @@ def room_to_ies(room):
                 window_geos.append(sf.geometry)
             open_count += 1
         if len(window_geos) != 0:
-            openings.append(_opening_to_ies(fg, window_geos, 0))
+            openings.append(_opening_to_gem(fg, window_geos, 0))
         if len(door_geos) != 0:
-            openings.append(_opening_to_ies(fg, door_geos, 1))
+            openings.append(_opening_to_gem(fg, door_geos, 1))
 
         # create the final string for the face
         open_str = '\n' + '\n'.join(openings) if len(openings) != 0 else ''
         faces.append('%s%d%s' % (face_str, open_count, open_str))
 
+    # create the final GEM string for the space
     is_void = room.exclude_floor_area
     if is_void:
         space = GEM_TYPES.UnconditionedSpace.to_gem(
@@ -390,20 +339,7 @@ def room_to_ies(room):
             face_count=face_count - air_boundary_count,
             vertices=vertices, faces='\n'.join(faces)
         )
-
-    # collect all the shades assigned to the room and its sub elements
-    child_shades = list(room.shades)
-    for face in room.faces:
-        child_shades.extend(face.shades)
-        for ap in face._apertures:
-            child_shades.extend(ap.shades)
-        for dr in face._doors:
-            child_shades.extend(dr.shades)
-    if child_shades:
-        formatted_shades = shades_to_ies(child_shades)
-        return '\n'.join((space, formatted_shades))
-    else:
-        return space
+    return space
 
 
 def model_to_gem(model, project_info=None, convert_room_ids=True):
@@ -457,7 +393,6 @@ def model_to_gem(model, project_info=None, convert_room_ids=True):
         )
         header = header + site
     rooms_data = [room_to_ies(room) for room in model.rooms]
-    context_shades = shades_to_ies(model.shades)
-    mesh_shades = shade_meshes_to_ies(model.shade_meshes)
-    gem_data = [header] + rooms_data + [context_shades, mesh_shades]
+    context_shades = shades_to_gem(model.shades + list(model.shade_meshes))
+    gem_data = [header] + rooms_data + [context_shades]
     return '\n'.join(gem_data)

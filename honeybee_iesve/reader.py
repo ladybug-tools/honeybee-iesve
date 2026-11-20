@@ -1,11 +1,9 @@
 import math
 import re
-from typing import Iterator, List, Tuple, Union, Dict
 import uuid
 
-from ladybug_geometry.geometry3d import Face3D, Point3D, Vector3D, \
-    Plane, Mesh3D
-from ladybug_geometry.geometry2d import Polygon2D, Point2D, Vector2D
+from ladybug_geometry.geometry3d import Vector3D, Point3D, Plane, Face3D, Mesh3D
+from ladybug_geometry.geometry2d import Point2D, Polygon2D
 from ladybug_geometry.intersection2d import closest_point2d_on_line2d
 from honeybee.model import Model, Shade, Room, Face, Aperture, Door, \
     AirBoundary, ShadeMesh
@@ -16,8 +14,13 @@ from .config import IESVE_TOLERANCE, OPENING_OFFSET, IMPORT_IGNORE
 from .types import GEM_TYPES
 
 
-def _gem_object_type(info: str, keyword: str = 'IES') -> GEM_TYPES:
-    """Get GEM object type from info."""
+def _gem_object_type(info, keyword='IES'):
+    """Get GEM object type from info.
+
+    Args:
+        info: Text string for the file contents to search.
+        keyword: Text for the keyword to be used. (Default: IES).
+    """
     type_ = int(re.findall(r'^TYPE\n(\d*)', info, re.MULTILINE)[0])
     subtype = int(re.findall(r'^SUBTYPE\n(\d*)', info, re.MULTILINE)[0])
     category = int(re.findall(r'^CATEGORY\n(\d*)', info, re.MULTILINE)[0])
@@ -26,22 +29,21 @@ def _gem_object_type(info: str, keyword: str = 'IES') -> GEM_TYPES:
     )
 
 
-def _add_user_date(face: Union[Face, Shade], user_data: Dict):
-    """Add user data to a face or a shade object."""
+def _add_user_data(hb_obj, user_data=None):
+    """Add user data to any Honeybee object (including Face and Shade)."""
     if not user_data:
         return
-    if face.user_data:
-        # the dictionary exists
-        face.user_data.update(user_data)
+    if hb_obj.user_data:  # the dictionary exists
+        hb_obj.user_data.update(user_data)
     else:
-        face.user_data = user_data
+        hb_obj.user_data = user_data
 
 
 def _get_id(display_name):
-    """Extract the id from display name.
+    """Extract an id from display name. Will be None if no ID is found.
 
-    In version 2023 the ID is included in the GEM file as inside [] at the end of the
-    name.
+    Note that, in IESVE version 2023, the ID is included in the GEM file as
+    inside [] at the end of the name.
     """
     id_ = re.findall(r'\s\[(.*)\]$', display_name, re.MULTILINE)
     if id_:
@@ -50,55 +52,60 @@ def _get_id(display_name):
         return None
 
 
-def _update_name(obj: Union[Shade, Room], display_name: str, count: int = None):
-    """Add group id and display name to objects."""
-    if not isinstance(obj, Room):
-        identifier = \
-            clean_string(display_name) if count \
-            else clean_string(f'{display_name}-{count}')
-        _add_user_date(
-            face=obj, user_data={'__group_id__': identifier}
-        )
+def _update_name(hb_obj, display_name, count=None):
+    """Add display_name, identifier, and __group_id__ in user_data to any Honeybee object."""
+    if not isinstance(hb_obj, Room):
+        identifier = clean_string(display_name) if count \
+            else clean_string('{}-{}'.format(display_name, count))
+        _add_user_data(hb_obj=hb_obj, user_data={'__group_id__': identifier})
 
     id_ = _get_id(display_name)
     if id_:
-        obj.identifier = f'{id_}-{count}' if count else id_
-        obj.display_name = display_name.replace(f' [{id_}]', '')
+        hb_obj.identifier = '{}-{}'.format(id_, count) if count else id_
+        hb_obj.display_name = display_name.replace(' [{}]'.format(id_), '')
     else:
-        obj.display_name = display_name
+        hb_obj.display_name = display_name
 
 
-def _create_shade(
-        boundary: List[Point3D], holes: List[Point3D] = None,
-        is_detached: bool = True, user_data: Dict = None):
-    """Create a Honeybee Shade object"""
-    geometry = Face3D(boundary, holes=holes)
-    face = Shade(
-        str(uuid.uuid4()), geometry=geometry,
-        is_detached=is_detached
-    )
-    _add_user_date(face, user_data)
-    return face
-
-
-def _opening_from_ies(geometry: Face3D, content: Iterator) -> Tuple[List[Point3D], int]:
-    """Translate an opening from gem format.
+def _create_shade(boundary, holes=None, is_detached=True, user_data=None):
+    """Create a Honeybee Shade object.
 
     Args:
-        parent_geo: Geometry of the parent object.
-        content: A GEM string
+        boundary: A list of Point3D for the boundary of the Shade.
+        holes: A list of lists of Point3D for the holes in the Shade geometry.
+        is_detached: Boolean for whether the Shade is detached.
+        user_data: Optional dictionary of user_data for the Shade
+    """
+    geometry = Face3D(boundary, holes=holes)
+    shade = Shade(str(uuid.uuid4()), geometry=geometry, is_detached=is_detached)
+    _add_user_data(shade, user_data)
+    return shade
+
+
+def _opening_from_ies(parent_geo, content):
+    """Translate an opening from GEM format.
+
+    Args:
+        parent_geo: Face3D for the geometry of the parent object.
+        content: A list of GEM strings containing child openings. Each item in the
+            list is a line of the GEM file.
 
     Returns:
-        opening_geos: A list of Face3D geometries for openings.
-        opening_type: An integer between 0-2. 0 for apertures, 1 for doors and 2 for
-            holes.
-    """
+        A tuple with four elements.
 
-    if geometry.plane.n.z in (1, -1):
-        # horizontal faces
-        origin = geometry.upper_right_corner
+        -   opening_type: An integer for the type of opening. 0 is Aperture, 1 is
+            Door, 2 is AirBoundary hole.
+
+        -   opening_vertices: A list of Point3D for the opening geometry.
+
+        -   opening_vertices_2d: A list of Point2D for the opening geometry.
+
+        -   opening_area: A number for the area of the opening.
+    """
+    if parent_geo.max.z - parent_geo.min.z < IESVE_TOLERANCE:  # perfectly horizontal in IESVE
+        origin = parent_geo.upper_right_corner
     else:
-        origin = geometry.lower_left_corner
+        origin = parent_geo.lower_left_corner
 
     # This is how the next line looks
     # 5 2
@@ -109,9 +116,9 @@ def _opening_from_ies(geometry: Face3D, content: Iterator) -> Tuple[List[Point3D
     # 0.000000     0.000000
     # 10.373100     0.000000
     tolerance = OPENING_OFFSET
-    boundary_2d: Polygon2D = geometry.boundary_polygon2d
+    boundary_2d = parent_geo.boundary_polygon2d
     offset_boundary_2d = boundary_2d.offset(tolerance)
-    origin_2d = geometry.plane.xyz_to_xy(origin)
+    origin_2d = parent_geo.plane.xyz_to_xy(origin)
 
     # create vertices in 2D
     opening_vertices = []
@@ -124,7 +131,7 @@ def _opening_from_ies(geometry: Face3D, content: Iterator) -> Tuple[List[Point3D
             # Translucent shade
             x_m, y_m, opacity = [float(v) for v in cnt]
         vertex_2d = Point2D(origin_2d.x - x_m, origin_2d.y - y_m)
-        vertex = geometry.plane.xy_to_xyz(vertex_2d)
+        vertex = parent_geo.plane.xy_to_xyz(vertex_2d)
         on_segments = []
         for segment in boundary_2d.segments:
             close_pt = closest_point2d_on_line2d(vertex_2d, segment)
@@ -132,11 +139,11 @@ def _opening_from_ies(geometry: Face3D, content: Iterator) -> Tuple[List[Point3D
                 on_segments.append((segment, close_pt))
 
         if not on_segments or opening_type == 2:
-            # for holes don't move the vertex
+            # for AirBoundary holes don't move the vertex
             pass
         elif len(on_segments) == 1:
             # it is an edge
-            vector: Vector2D = on_segments[0][0].v
+            vector = on_segments[0][0].v
             v1 = vector.rotate(math.pi / 2).normalize() * tolerance
             v2 = vector.rotate(-math.pi / 2).normalize() * tolerance
             v = vertex_2d.move(v1)
@@ -156,11 +163,10 @@ def _opening_from_ies(geometry: Face3D, content: Iterator) -> Tuple[List[Point3D
 
             points_sorted = sorted(dist_col, key=lambda x: x[0])
             vertex_2d = points_sorted[0][1]
-        else:
-            # this should not happen!
-            print(f'{vertex} is adjacent to more than 2 edges of the same polygon.')
+        else:  # this should not happen!
+            print('{} is adjacent to more than 2 edges of the same polygon.'.format(vertex))
 
-        vertex = geometry.plane.xy_to_xyz(vertex_2d)
+        vertex = parent_geo.plane.xy_to_xyz(vertex_2d)
         opening_vertices.append(vertex)
         opening_vertices_2d.append(vertex_2d)
 
@@ -170,8 +176,18 @@ def _opening_from_ies(geometry: Face3D, content: Iterator) -> Tuple[List[Point3D
     return opening_type, opening_vertices, opening_vertices_2d, opening_area
 
 
-def _create_tree(info: str, tree_type=1) -> Shade:
-    """Create a Tree from an IES Tree."""
+def _create_tree(info, tree_type=1):
+    """Create two Honeybee Shades from a GEM Tree string.
+
+    The two shades are each rectangles that define tree along the X and Y world
+    axes respectively. The user_data attached to these Shades is formatted such
+    that they will be exported back to GEM as a single Tree object.
+
+    Args:
+        info: Text string for the file contents of the Tree.
+        tree_type: Integer for the type of Tree. This will be stored in the
+            Honeybee Shade user_data for export back to GEM.
+    """
     values = [float(v) for v in info.strip().split()]
     assert len(values) == 8, 'Length of data for tree is not 8 segments.'
     # calculate tree geometry
@@ -218,8 +234,15 @@ def _create_tree(info: str, tree_type=1) -> Shade:
     return tree_0, tree_1
 
 
-def _create_pv(info: str) -> Shade:
-    """Create a PV panel from GEM PV panel."""
+def _create_pv(info):
+    """Create a Honeybee Shade from a GEM PV string.
+
+    The user_data attached to the Shade is formatted such that it will be
+    exported back to GEM as a PV object.
+
+    Args:
+        info: Text string for the file contents of the PV.
+    """
     values = [float(v) for v in info.strip().split()]
     assert len(values) == 7, 'Length of data for PV is not 7 segments.'
     # calculate PV geometry
@@ -241,21 +264,31 @@ def _create_pv(info: str) -> Shade:
     return pv
 
 
-def _parse_gem_segment(
-        segment: str, ignore_shade_mesh=False) -> Union[Room, ShadeMesh, Shade]:
-    """Parse a segment of the GEM file.
+def _parse_gem_segment(segment, ignore_shade_mesh=False):
+    """Parse a segment of a GEM file.
 
-    Each segment has the information for a room or a shade object.
+    Args:
+        segment: Text for the segment of a GEM file. A segment is defined as a
+            unit of the file contents that contains a complete Room, Shade or
+            ShadeMesh object.
+        ignore_shade_mesh: Boolean for wether the segments containing shade groups
+            should be returned as a joined ShadeMesh object. If True, shade
+            groups will be returned as a list of Honeybee Shade objects instead
+            of a single ShadeMesh.
+
+    Returns:
+        Either a Honeybee Room, a Honeybee ShadeMesh, or a list of Honeybee Shades
+        derived from the input segment.
     """
     for keyword in ['IES', 'LAN', 'PVP']:
         if keyword in segment:
-            info, segments = re.split(f'\n{keyword} ', segment)
+            info, segments = re.split('\n{} '.format(keyword), segment)
             break
     else:
         raise ValueError(
             'There is a segment with an unsupported type in the input GEM file. '
             'Reach out to us with a copy of the GEM file and the information below:\n'
-            f'{segment}'
+            '{}'.format(segment)
         )
 
     gem_type = _gem_object_type(info=info, keyword=keyword)
@@ -273,7 +306,7 @@ def _parse_gem_segment(
     elif gem_type == GEM_TYPES.Tree:
         tree_type = next(content)
         assert tree_type.startswith('2D Tree'), \
-            f'{tree_type} is not currently supported.'
+            '{} is not currently supported.'.format(tree_type)
         tree_type = int(tree_type.split()[-1])
         tree_info = next(content)
         faces = _create_tree(tree_info, tree_type=tree_type)
@@ -290,9 +323,7 @@ def _parse_gem_segment(
     ]
 
     # create a shade mesh for shades with multiple faces
-    if not ignore_shade_mesh \
-        and gem_type == GEM_TYPES.ContextBuilding \
-            and face_count > 1:
+    if not ignore_shade_mesh and gem_type == GEM_TYPES.ContextBuilding and face_count > 1:
         faces = []
         for _ in range(face_count):
             boundary = tuple(int(i) - 1 for i in next(content).split()[1:])
@@ -338,7 +369,7 @@ def _parse_gem_segment(
                 holes.append(opening_vertices)
                 holes_2d.append(Polygon2D(opening_vertices_2d))
             else:
-                raise ValueError(f'Unsupported opening type: {opening_type}')
+                raise ValueError('Unsupported opening type: {}'.format(opening_type))
 
         if gem_type == GEM_TYPES.Space or gem_type == GEM_TYPES.UnconditionedSpace:
             # A model face
@@ -349,7 +380,7 @@ def _parse_gem_segment(
                 if isinstance(face.boundary_condition, Ground):
                     print(
                         'Changing boundary condition from Ground to Outdoors for '
-                        f'{face.display_name} in {display_name} [{identifier}].'
+                        '{} in {} [{}].'.format(face.display_name, display_name, identifier)
                     )
                     face.boundary_condition = Outdoors()
             face.add_apertures(apertures)
@@ -466,17 +497,15 @@ def _parse_gem_segment(
         return faces
 
 
-def model_from_gem(
-    gem_str: str, model_id: str = 'Unnamed', model_name: str = None
-) -> Model:
-    """Create a Honeybee Model from the string contents of a VE GEM file.
+def model_from_gem(gem_str, model_id='Unnamed', model_name=None):
+    """Create a Honeybee Model from the string contents of an IESVE GEM file.
 
     Args:
         gem_str: Text string representation of the contents of a GEM file.
         model_id: Text string to be applied as the Model identifier. Typically,
             this is derived from the GEM file name. (Default: Unnamed).
-        model_name: Text string to be applied as the Model identifier. If None,
-            this will be the same as the model_id. (Default: None).
+        model_name: Optional text string to be applied as the Model identifier.
+            If None, this will be the same as the model_id. (Default: None).
 
     Returns:
         A Honeybee Model derived from the GEM file contents.
