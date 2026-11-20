@@ -1,6 +1,7 @@
 """honeybee iesve translation commands."""
 import click
 import os
+import io
 import sys
 import logging
 import json
@@ -97,7 +98,7 @@ def model_from_gem(gem_file, output_file=None):
         output_file: Optional HBJSON file path to output the JSON string of the
             translation. If None, the string will be returned from this function.
     """
-    with open(gem_file, 'r') as gf:
+    with io.open(gem_file, 'r', encoding='utf-8') as gf:
         file_contents = gf.read()
     model_name = os.path.basename(gem_file)
     if model_name.lower().endswith('.gem'):
