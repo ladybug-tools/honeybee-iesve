@@ -1,0 +1,7 @@
+honeybee\_iesve.cli.translate module
+====================================
+
+.. automodule:: honeybee_iesve.cli.translate
+   :members:
+   :undoc-members:
+   :show-inheritance:

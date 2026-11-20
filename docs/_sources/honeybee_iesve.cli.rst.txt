@@ -1,0 +1,18 @@
+honeybee\_iesve.cli package
+===========================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   honeybee_iesve.cli.translate
+
+Module contents
+---------------
+
+.. automodule:: honeybee_iesve.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

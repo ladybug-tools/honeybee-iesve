@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>honeybee_iesve.types module &#8212; honeybee-iesve  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=0bf093e7" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=e6365d57" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="honeybee_iesve.writer module" href="honeybee_iesve.writer.html" />
+    <link rel="prev" title="honeybee_iesve.templates module" href="honeybee_iesve.templates.html" />
+<link rel="icon" type="image/x-icon" href="https://github.com/ladybug-tools/artwork/raw/refs/heads/master/icons_bugs/ico/honeybee.ico">
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          honeybee-iesve</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/index.html">CLI Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli/index.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli/index.html#commands">Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli/translate.html">translate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli/translate.html#honeybee-iesve-translate">honeybee-iesve translate</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="cli/translate.html#honeybee-iesve-translate-model-from-gem">model-from-gem</a></li>
+<li class="toctree-l5"><a class="reference internal" href="cli/translate.html#honeybee-iesve-translate-model-to-gem">model-to-gem</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="honeybee_iesve.html">honeybee_iesve package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="honeybee_iesve.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.cli.html">honeybee_iesve.cli package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.cli.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="honeybee_iesve.cli.translate.html">honeybee_iesve.cli.translate module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="honeybee_iesve.cli.translate.html#honeybee_iesve.cli.translate.model_from_gem"><code class="docutils literal notranslate"><span class="pre">model_from_gem()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="honeybee_iesve.cli.translate.html#honeybee_iesve.cli.translate.model_to_gem"><code class="docutils literal notranslate"><span class="pre">model_to_gem()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.cli.html#module-honeybee_iesve.cli">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.properties.html">honeybee_iesve.properties package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.properties.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="honeybee_iesve.properties.model.html">honeybee_iesve.properties.model module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="honeybee_iesve.properties.model.html#honeybee_iesve.properties.model.ModelIesveProperties"><code class="docutils literal notranslate"><span class="pre">ModelIesveProperties</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="honeybee_iesve.properties.model.html#honeybee_iesve.properties.model.ModelIesveProperties.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="honeybee_iesve.properties.model.html#honeybee_iesve.properties.model.ModelIesveProperties.apply_properties_from_dict"><code class="docutils literal notranslate"><span class="pre">apply_properties_from_dict()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="honeybee_iesve.properties.model.html#honeybee_iesve.properties.model.ModelIesveProperties.check_for_extension"><code class="docutils literal notranslate"><span class="pre">check_for_extension()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="honeybee_iesve.properties.model.html#honeybee_iesve.properties.model.ModelIesveProperties.to_dict"><code class="docutils literal notranslate"><span class="pre">to_dict()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="honeybee_iesve.properties.model.html#honeybee_iesve.properties.model.ModelIesveProperties.host"><code class="docutils literal notranslate"><span class="pre">host</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.properties.html#module-honeybee_iesve.properties">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="honeybee_iesve.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.config.html">honeybee_iesve.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.reader.html">honeybee_iesve.reader module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.reader.html#honeybee_iesve.reader.model_from_gem"><code class="docutils literal notranslate"><span class="pre">model_from_gem()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.templates.html">honeybee_iesve.templates module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">honeybee_iesve.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES"><code class="docutils literal notranslate"><span class="pre">GEM_TYPES</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.from_info"><code class="docutils literal notranslate"><span class="pre">from_info()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.from_user_data"><code class="docutils literal notranslate"><span class="pre">from_user_data()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.ContextBuilding"><code class="docutils literal notranslate"><span class="pre">ContextBuilding</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.PV"><code class="docutils literal notranslate"><span class="pre">PV</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Shade"><code class="docutils literal notranslate"><span class="pre">Shade</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Shade_2"><code class="docutils literal notranslate"><span class="pre">Shade_2</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Space"><code class="docutils literal notranslate"><span class="pre">Space</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Topography"><code class="docutils literal notranslate"><span class="pre">Topography</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.TranslucentShade"><code class="docutils literal notranslate"><span class="pre">TranslucentShade</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Tree"><code class="docutils literal notranslate"><span class="pre">Tree</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.UnconditionedSpace"><code class="docutils literal notranslate"><span class="pre">UnconditionedSpace</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.writer.html">honeybee_iesve.writer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.writer.html#honeybee_iesve.writer.model_to_gem"><code class="docutils literal notranslate"><span class="pre">model_to_gem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.writer.html#honeybee_iesve.writer.room_to_ies"><code class="docutils literal notranslate"><span class="pre">room_to_ies()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.writer.html#honeybee_iesve.writer.shade_to_gem"><code class="docutils literal notranslate"><span class="pre">shade_to_gem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="honeybee_iesve.writer.html#honeybee_iesve.writer.shades_to_gem"><code class="docutils literal notranslate"><span class="pre">shades_to_gem()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="honeybee_iesve.html#module-honeybee_iesve">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/index.html">CLI Docs</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="honeybee_iesve.html">honeybee_iesve package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="honeybee_iesve.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="honeybee_iesve.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.config.html">honeybee_iesve.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.reader.html">honeybee_iesve.reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.templates.html">honeybee_iesve.templates module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">honeybee_iesve.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES"><code class="docutils literal notranslate"><span class="pre">GEM_TYPES</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.from_info"><code class="docutils literal notranslate"><span class="pre">from_info()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.from_user_data"><code class="docutils literal notranslate"><span class="pre">from_user_data()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.ContextBuilding"><code class="docutils literal notranslate"><span class="pre">ContextBuilding</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.PV"><code class="docutils literal notranslate"><span class="pre">PV</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Shade"><code class="docutils literal notranslate"><span class="pre">Shade</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Shade_2"><code class="docutils literal notranslate"><span class="pre">Shade_2</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Space"><code class="docutils literal notranslate"><span class="pre">Space</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Topography"><code class="docutils literal notranslate"><span class="pre">Topography</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.TranslucentShade"><code class="docutils literal notranslate"><span class="pre">TranslucentShade</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Tree"><code class="docutils literal notranslate"><span class="pre">Tree</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.UnconditionedSpace"><code class="docutils literal notranslate"><span class="pre">UnconditionedSpace</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.writer.html">honeybee_iesve.writer module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="honeybee_iesve.html#module-honeybee_iesve">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="honeybee_iesve.templates.html" title="Previous Chapter: honeybee_iesve.templates module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; honeybee_iesv...</span>
+    </a>
+  </li>
+  <li>
+    <a href="honeybee_iesve.writer.html" title="Next Chapter: honeybee_iesve.writer module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">honeybee_iesv... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/honeybee_iesve.types.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/index.html">CLI Docs</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="honeybee_iesve.html">honeybee_iesve package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="honeybee_iesve.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="honeybee_iesve.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.config.html">honeybee_iesve.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.reader.html">honeybee_iesve.reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.templates.html">honeybee_iesve.templates module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">honeybee_iesve.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES"><code class="docutils literal notranslate"><span class="pre">GEM_TYPES</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.from_info"><code class="docutils literal notranslate"><span class="pre">from_info()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.from_user_data"><code class="docutils literal notranslate"><span class="pre">from_user_data()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.ContextBuilding"><code class="docutils literal notranslate"><span class="pre">ContextBuilding</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.PV"><code class="docutils literal notranslate"><span class="pre">PV</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Shade"><code class="docutils literal notranslate"><span class="pre">Shade</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Shade_2"><code class="docutils literal notranslate"><span class="pre">Shade_2</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Space"><code class="docutils literal notranslate"><span class="pre">Space</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Topography"><code class="docutils literal notranslate"><span class="pre">Topography</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.TranslucentShade"><code class="docutils literal notranslate"><span class="pre">TranslucentShade</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.Tree"><code class="docutils literal notranslate"><span class="pre">Tree</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#honeybee_iesve.types.GEM_TYPES.UnconditionedSpace"><code class="docutils literal notranslate"><span class="pre">UnconditionedSpace</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="honeybee_iesve.writer.html">honeybee_iesve.writer module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="honeybee_iesve.html#module-honeybee_iesve">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <section id="module-honeybee_iesve.types">
+<span id="honeybee-iesve-types-module"></span><h1>honeybee_iesve.types module<a class="headerlink" href="#module-honeybee_iesve.types" title="Link to this heading">¶</a></h1>
+<p>Enumeration-style container for different object types in GEM.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">honeybee_iesve.types.</span></span><span class="sig-name descname"><span class="pre">GEM_TYPES</span></span><a class="reference internal" href="_modules/honeybee_iesve/types.html#GEM_TYPES"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Enumeration-style container for different object types in GEM.</p>
+<p>There is no public documentation for GEM files but here is our understanding based
+on the sample files.</p>
+<section id="object-category-type-subtype-layer-color-col-rgb-keyword">
+<h2>|     object     | CATEGORY | TYPE | SUBTYPE | LAYER | COLOR | COL-RGB  | KEYWORD |<a class="headerlink" href="#object-category-type-subtype-layer-color-col-rgb-keyword" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line">Rooms/Spaces  |    1     |  1   |   2001  |   1   |   0   | 16711680 |   IES   |</div>
+<div class="line">UnCond Space  |    1     |  1   |   2002  |   1   |   0   | 16711680 |   IES   |</div>
+<div class="line">Trans Shades  |    1     |  1   |   2102  |  64   |   0   |    0     |   IES   |</div>
+<div class="line-block">
+<div class="line">Nghbr Bldg   |    1     |  2   |    0    |  62   |   0   | 16711935 |   IES   |</div>
+<div class="line-block">
+<div class="line-block">
+<div class="line">PV       |    3     | 202  |    0    |   1   |   0   |  32767   |   PVP   |</div>
+</div>
+<div class="line">Tree      |    1     |  3   |    0    |  65   |   0   | 2399294  |   LAN   |</div>
+</div>
+<div class="line">Topography   |    1     |  3   |    0    |  63   |   0   |  38400   |   IES   |</div>
+</div>
+<div class="line">Local Shades  |    1     |  4   |    0    |  64   |  62   |  65280   |   IES   |</div>
+<div class="line">Local Shades  |    1     |  4   |   2101  |  66   |   1   |  65280   |   IES   |</div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.from_info">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/honeybee_iesve/types.html#GEM_TYPES.from_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.from_info" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize type from GEM info.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.from_user_data">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_user_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/honeybee_iesve/types.html#GEM_TYPES.from_user_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.from_user_data" title="Link to this definition">¶</a></dt>
+<dd><p>Get type from user_data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.ContextBuilding">
+<span class="sig-name descname"><span class="pre">ContextBuilding</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.ContextBuilding:</span> <span class="pre">'1-002-0000-62-00-16711935-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.ContextBuilding" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.PV">
+<span class="sig-name descname"><span class="pre">PV</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.PV:</span> <span class="pre">'3-202-0000-01-00-32767-PVP'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.PV" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.Shade">
+<span class="sig-name descname"><span class="pre">Shade</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.Shade:</span> <span class="pre">'1-004-0000-64-62-65280-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.Shade" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.Shade_2">
+<span class="sig-name descname"><span class="pre">Shade_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.Shade_2:</span> <span class="pre">'1-004-2101-66-01-65280-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.Shade_2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.Space">
+<span class="sig-name descname"><span class="pre">Space</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.Space:</span> <span class="pre">'1-001-2001-01-00-16711680-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.Space" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.Topography">
+<span class="sig-name descname"><span class="pre">Topography</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.Topography:</span> <span class="pre">'1-003-0000-63-00-38400-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.Topography" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.TranslucentShade">
+<span class="sig-name descname"><span class="pre">TranslucentShade</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.TranslucentShade:</span> <span class="pre">'1-001-2102-64-00-0-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.TranslucentShade" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.Tree">
+<span class="sig-name descname"><span class="pre">Tree</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.Tree:</span> <span class="pre">'1-003-0000-65-00-2399294-LAN'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.Tree" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="honeybee_iesve.types.GEM_TYPES.UnconditionedSpace">
+<span class="sig-name descname"><span class="pre">UnconditionedSpace</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GEM_TYPES.UnconditionedSpace:</span> <span class="pre">'1-001-2002-01-00-16711680-IES'&gt;</span></em><a class="headerlink" href="#honeybee_iesve.types.GEM_TYPES.UnconditionedSpace" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2026, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.0.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

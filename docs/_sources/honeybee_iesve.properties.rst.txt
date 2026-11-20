@@ -1,0 +1,18 @@
+honeybee\_iesve.properties package
+==================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   honeybee_iesve.properties.model
+
+Module contents
+---------------
+
+.. automodule:: honeybee_iesve.properties
+   :members:
+   :undoc-members:
+   :show-inheritance:

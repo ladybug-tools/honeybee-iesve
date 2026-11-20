@@ -1,0 +1,6 @@
+translate
+=========
+
+.. click:: honeybee_iesve.cli.translate:translate
+   :prog: honeybee-iesve translate
+   :show-nested:
